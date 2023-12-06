@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pranavraaghav/go-video-preview/src/internal/domain/video"
-	"github.com/pranavraaghav/go-video-preview/src/internal/usecase"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -81,8 +80,7 @@ func (v *videoControllerImplementation) HandleImages(w http.ResponseWriter, r *h
 		return
 	}
 
-	usecases := usecase.InitUsecases()
-	zipOutputFilePath, err := usecases.Video.GenerateImageZipFromVideo(filename, width, height)
+	zipOutputFilePath, err := v.usecase.GenerateImageZipFromVideo(filename, width, height)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
