@@ -13,10 +13,14 @@ import (
 	"time"
 )
 
-type videoUsecaseImplementation struct{}
+type videoUsecaseImplementation struct {
+	ffmpegExecutablePath string
+}
 
-func NewVideoUsecaseImplementation() video.UseCase {
-	return &videoUsecaseImplementation{}
+func NewVideoUsecaseImplementation(ffmpegPath string) video.UseCase {
+	return &videoUsecaseImplementation{
+		ffmpegExecutablePath: ffmpegPath,
+	}
 }
 
 func (v *videoUsecaseImplementation) GetMaxUploadFileSizeInBytes() int64 {
@@ -59,7 +63,7 @@ func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(filename string, 
 	// Generate images from video using ffmpeg
 
 	err = exec.Command(
-		"~/ffmpeg",
+		v.ffmpegExecutablePath,
 		"-i", fmt.Sprintf("./uploads/%s", filename),
 		"-r", "0.2",
 		"-s", fmt.Sprintf("%dx%d", width, height),
