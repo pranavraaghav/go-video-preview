@@ -21,5 +21,7 @@ func StartNewRestDelivery(config *utils.Config, usecases usecase.Usecases) {
 	serverPort := fmt.Sprintf(":%d", config.Port)
 
 	// Start server
-	http.ListenAndServe(serverPort, mux)
+	logger.Infof("Starting server on port %s", serverPort)
+	err := http.ListenAndServe(serverPort, mux)
+	logger.Infof("Server stopped with error: %v", err)
 }
