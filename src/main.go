@@ -10,5 +10,5 @@ func main() {
 	config := utils.NewConfig()
 
 	usecases := usecase.InitUsecases(config)
-	rest.StartNewRestDelivery(usecases)
+	rest.StartNewRestDelivery(config, usecases)
 }

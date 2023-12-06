@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	FfmpegPath string `env:"PATH_TO_FFMPEG_EXECUTABLE" envDefault:""`
+	Port       int    `env:"PORT" envDefault:"8080"`
 }
 
 func NewConfig() *Config {
@@ -18,7 +19,7 @@ func NewConfig() *Config {
 	}
 	cfg := Config{}
 	if err = env.Parse(&cfg); err != nil {
-		fmt.Println("Error parsing .env file")
+		fmt.Println("Error parsing env variables")
 		panic(err)
 	}
 	return &cfg

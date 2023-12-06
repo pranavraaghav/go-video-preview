@@ -1,13 +1,15 @@
 package rest
 
 import (
+	"fmt"
 	controllerVideo "github.com/pranavraaghav/go-video-preview/src/delivery/rest/controllers/video"
 	"github.com/pranavraaghav/go-video-preview/src/delivery/rest/routers"
 	"github.com/pranavraaghav/go-video-preview/src/internal/usecase"
+	"github.com/pranavraaghav/go-video-preview/src/utils"
 	"net/http"
 )
 
-func StartNewRestDelivery(usecases usecase.Usecases) {
+func StartNewRestDelivery(config *utils.Config, usecases usecase.Usecases) {
 	mux := http.NewServeMux()
 
 	// Get all controllers
@@ -16,11 +18,8 @@ func StartNewRestDelivery(usecases usecase.Usecases) {
 	// Set all routes
 	routers.SetVideoRoutes(mux, videoController)
 
-	serverPort := ":8080"
+	serverPort := fmt.Sprintf(":%d", config.Port)
 
 	// Start server
-	err := http.ListenAndServe(serverPort, mux)
-	if err != nil {
-		panic(err)
-	}
+	http.ListenAndServe(serverPort, mux)
 }
