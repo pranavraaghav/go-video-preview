@@ -1,7 +1,5 @@
 package controllerVideo
 
-type UploadResponse struct {
-	Status   string `json:"status"`
-	Message  string `json:"message"`
+type UploadResponsePayload struct {
 	Filename string `json:"filename"`
 }

@@ -52,9 +52,7 @@ func (v *videoControllerImplementation) HandleUpload(w http.ResponseWriter, r *h
 	}
 
 	storedFileName := filepath.Base(*storedFilePath)
-	p := UploadResponse{
-		Status:   "success",
-		Message:  "File uploaded successfully",
+	p := UploadResponsePayload{
 		Filename: storedFileName,
 	}
 	err = json.NewEncoder(w).Encode(p)
