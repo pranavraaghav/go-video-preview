@@ -57,14 +57,15 @@ func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(filename string, 
 	}
 
 	// Generate images from video using ffmpeg
-	command := fmt.Sprintf(
-		"~/ffmpeg -i ./uploads/%s -r 0.2 -s %dx%d -f image2 %s/%%03d.jpeg",
-		filename,
-		width,
-		height,
-		outputDirPath)
 
-	err = exec.Command("sh", "-c", command).Run()
+	err = exec.Command(
+		"~/ffmpeg",
+		"-i", fmt.Sprintf("./uploads/%s", filename),
+		"-r", "0.2",
+		"-s", fmt.Sprintf("%dx%d", width, height),
+		"-f", "image2",
+		fmt.Sprintf("%s/%%03d.jpeg", outputDirPath),
+	).Run()
 	if err != nil {
 		return nil, err
 	}
