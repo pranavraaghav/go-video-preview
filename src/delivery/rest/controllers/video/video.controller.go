@@ -25,12 +25,12 @@ func NewVideoController(usecase video.UseCase) VideoController {
 }
 
 func (v *videoControllerImplementation) HandleUpload(w http.ResponseWriter, r *http.Request) {
-	maxUploadFileSizeInBytes := v.usecase.GetMaxUploadFileSizeInBytes()
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	maxUploadFileSizeInBytes := v.usecase.GetMaxUploadFileSizeInBytes()
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadFileSizeInBytes)
 	if err := r.ParseMultipartForm(maxUploadFileSizeInBytes); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -67,7 +67,7 @@ func (v *videoControllerImplementation) HandleImages(w http.ResponseWriter, r *h
 		return
 	}
 
-	// Query params
+	// Get filename and dimensions from query params
 	filename := r.URL.Query().Get("filename")
 	if filename == "" {
 		http.Error(w, "filename not provided in query params", http.StatusBadRequest)
@@ -80,16 +80,17 @@ func (v *videoControllerImplementation) HandleImages(w http.ResponseWriter, r *h
 		return
 	}
 
+	// Generate zip with images from video
 	zipOutputFilePath, err := v.usecase.GenerateImageZipFromVideo(filename, width, height)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Serve zip file
 	zipOutputFileName := filepath.Base(*zipOutputFilePath)
 	w.Header().Set("Content-Type", "application/zip")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", zipOutputFileName))
 	w.WriteHeader(http.StatusOK)
-
 	http.ServeFile(w, r, *zipOutputFilePath)
 }
