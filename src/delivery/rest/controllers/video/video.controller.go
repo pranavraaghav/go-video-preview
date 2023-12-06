@@ -79,9 +79,19 @@ func (v *videoControllerImplementation) HandleImages(w http.ResponseWriter, r *h
 		http.Error(w, "Invalid height or width", http.StatusBadRequest)
 		return
 	}
+	intervalBetweenImages, err := strconv.Atoi(r.URL.Query().Get("interval"))
+	if err != nil {
+		http.Error(w, "Invalid interval", http.StatusBadRequest)
+		return
+	}
 
 	// Generate zip with images from video
-	zipOutputFilePath, err := v.usecase.GenerateImageZipFromVideo(filename, width, height)
+	zipOutputFilePath, err := v.usecase.GenerateImageZipFromVideo(
+		filename,
+		width,
+		height,
+		intervalBetweenImages,
+	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

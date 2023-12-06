@@ -52,7 +52,12 @@ func (v *videoUsecaseImplementation) UploadFile(file multipart.File, fileHeader 
 
 // GenerateImageZipFromVideo generates images from video
 // returns path to zip file with all images
-func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(filename string, width int, height int) (*string, error) {
+func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(
+	filename string,
+	width int,
+	height int,
+	intervalBetweenImages int,
+) (*string, error) {
 	dirname := filename[:len(filename)-len(filepath.Ext(filename))] // filename without extension
 	outputDirPath := fmt.Sprintf("./output/%s", dirname)
 	err := os.MkdirAll(outputDirPath, os.ModePerm)
@@ -60,12 +65,13 @@ func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(filename string, 
 		return nil, err
 	}
 
-	// Generate images from video using ffmpeg
+	framesPerSecond := v.getFramesPerSecond(intervalBetweenImages)
 
+	// Generate images from video using ffmpeg
 	err = exec.Command(
 		v.ffmpegExecutablePath,
 		"-i", fmt.Sprintf("./uploads/%s", filename),
-		"-r", "0.2",
+		"-r", fmt.Sprintf("%0.2f", framesPerSecond),
 		"-s", fmt.Sprintf("%dx%d", width, height),
 		"-f", "image2",
 		fmt.Sprintf("%s/%%03d.jpeg", outputDirPath),
@@ -139,4 +145,8 @@ func (v *videoUsecaseImplementation) zipDirectory(source string, target string) 
 		_, err = io.Copy(fileWriter, file)
 		return err
 	})
+}
+
+func (v *videoUsecaseImplementation) getFramesPerSecond(interval int) float32 {
+	return 1 / float32(interval)
 }
