@@ -10,8 +10,8 @@ type Usecases struct {
 	Video video.UseCase
 }
 
-func InitUsecases(config *utils.Config) Usecases {
-	videoUsecase := usecaseVideo.NewVideoUsecaseImplementation(config.FfmpegPath)
+func InitUsecases(config *utils.Config, logger *utils.StandardLogger) Usecases {
+	videoUsecase := usecaseVideo.NewVideoUsecaseImplementation(config, logger)
 	return Usecases{
 		Video: videoUsecase,
 	}

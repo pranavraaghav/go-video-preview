@@ -8,7 +8,8 @@ import (
 
 func main() {
 	config := utils.NewConfig()
+	logger := utils.NewLogger(config)
 
-	usecases := usecase.InitUsecases(config)
-	rest.StartNewRestDelivery(config, usecases)
+	usecases := usecase.InitUsecases(config, logger)
+	rest.StartNewRestDelivery(config, logger, usecases)
 }

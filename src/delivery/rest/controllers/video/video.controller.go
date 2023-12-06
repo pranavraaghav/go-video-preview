@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pranavraaghav/go-video-preview/src/internal/domain/video"
+	"github.com/pranavraaghav/go-video-preview/src/utils"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -15,11 +16,13 @@ type VideoController interface {
 }
 
 type videoControllerImplementation struct {
+	logger  *utils.StandardLogger
 	usecase video.UseCase
 }
 
-func NewVideoController(usecase video.UseCase) VideoController {
+func NewVideoController(logger *utils.StandardLogger, usecase video.UseCase) VideoController {
 	return &videoControllerImplementation{
+		logger:  logger,
 		usecase: usecase,
 	}
 }

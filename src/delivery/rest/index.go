@@ -9,11 +9,11 @@ import (
 	"net/http"
 )
 
-func StartNewRestDelivery(config *utils.Config, usecases usecase.Usecases) {
+func StartNewRestDelivery(config *utils.Config, logger *utils.StandardLogger, usecases usecase.Usecases) {
 	mux := http.NewServeMux()
 
 	// Get all controllers
-	videoController := controllerVideo.NewVideoController(usecases.Video)
+	videoController := controllerVideo.NewVideoController(logger, usecases.Video)
 
 	// Set all routes
 	routers.SetVideoRoutes(mux, videoController)

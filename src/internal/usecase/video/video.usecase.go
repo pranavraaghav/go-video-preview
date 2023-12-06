@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"fmt"
 	"github.com/pranavraaghav/go-video-preview/src/internal/domain/video"
+	"github.com/pranavraaghav/go-video-preview/src/utils"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -15,11 +16,14 @@ import (
 
 type videoUsecaseImplementation struct {
 	ffmpegExecutablePath string
+	logger               *utils.StandardLogger
 }
 
-func NewVideoUsecaseImplementation(ffmpegPath string) video.UseCase {
+func NewVideoUsecaseImplementation(config *utils.Config, logger *utils.StandardLogger) video.UseCase {
+	ffmpegPath := config.FfmpegPath
 	return &videoUsecaseImplementation{
 		ffmpegExecutablePath: ffmpegPath,
+		logger:               logger,
 	}
 }
 
