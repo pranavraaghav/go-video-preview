@@ -5,20 +5,50 @@ import (
 	"fmt"
 	"github.com/pranavraaghav/go-video-preview/src/internal/domain/video"
 	"io"
+	"math/rand"
+	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
-type VideoUsecaseImplementation struct{}
+type videoUsecaseImplementation struct{}
 
 func NewVideoUsecaseImplementation() video.UseCase {
-	return &VideoUsecaseImplementation{}
+	return &videoUsecaseImplementation{}
+}
+
+func (v *videoUsecaseImplementation) GetMaxUploadFileSizeInBytes() int64 {
+	return int64(4096 * 4096)
+}
+
+func (v *videoUsecaseImplementation) UploadFile(file multipart.File, fileHeader *multipart.FileHeader) (*string, error) {
+	err := os.MkdirAll("uploads", os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	fileExtension := filepath.Ext(fileHeader.Filename)
+	dstFilename := fmt.Sprintf("%d%d", time.Now().UnixNano(), rand.Int63n(1000))
+	dstFilePath := fmt.Sprintf("./uploads/%s%s", dstFilename, fileExtension)
+	dst, err := os.Create(dstFilePath)
+	if err != nil {
+		return nil, err
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dstFilePath, nil
 }
 
 // GenerateImageZipFromVideo generates images from video
 // returns path to zip file with all images
-func (v *VideoUsecaseImplementation) GenerateImageZipFromVideo(filename string, width int, height int) (*string, error) {
+func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(filename string, width int, height int) (*string, error) {
 	dirname := filename[:len(filename)-len(filepath.Ext(filename))] // filename without extension
 	outputDirPath := fmt.Sprintf("./output/%s", dirname)
 	err := os.MkdirAll(outputDirPath, os.ModePerm)
@@ -55,7 +85,7 @@ func (v *VideoUsecaseImplementation) GenerateImageZipFromVideo(filename string, 
 	return &zipOutputFilePath, nil
 }
 
-func (v *VideoUsecaseImplementation) zipDirectory(source string, target string) error {
+func (v *videoUsecaseImplementation) zipDirectory(source string, target string) error {
 	zipFile, err := os.Create(target)
 	if err != nil {
 		return err

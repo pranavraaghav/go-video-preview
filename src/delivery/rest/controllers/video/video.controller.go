@@ -5,13 +5,9 @@ import (
 	"fmt"
 	"github.com/pranavraaghav/go-video-preview/src/internal/domain/video"
 	"github.com/pranavraaghav/go-video-preview/src/internal/usecase"
-	"io"
-	"math/rand"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 )
 
 type VideoController interface {
@@ -30,14 +26,14 @@ func NewVideoController(usecase video.UseCase) VideoController {
 }
 
 func (v *videoControllerImplementation) HandleUpload(w http.ResponseWriter, r *http.Request) {
-	MAX_UPLOAD_SIZE := int64(4096 * 4096)
+	maxUploadFileSizeInBytes := v.usecase.GetMaxUploadFileSizeInBytes()
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
-	if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadFileSizeInBytes)
+	if err := r.ParseMultipartForm(maxUploadFileSizeInBytes); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -47,34 +43,19 @@ func (v *videoControllerImplementation) HandleUpload(w http.ResponseWriter, r *h
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	defer file.Close()
 
-	err = os.MkdirAll("uploads", os.ModePerm)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	fileExtension := filepath.Ext(fileHeader.Filename)
-	dstFilename := fmt.Sprintf("%d%d", time.Now().UnixNano(), rand.Int63n(1000))
-	dst, err := os.Create(fmt.Sprintf("./uploads/%s%s", dstFilename, fileExtension))
+	storedFilePath, err := v.usecase.UploadFile(file, fileHeader)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	defer dst.Close()
-
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	storedFileName := filepath.Base(*storedFilePath)
 	p := UploadResponse{
 		Status:   "success",
 		Message:  "File uploaded successfully",
-		Filename: fmt.Sprintf("%s%s", dstFilename, fileExtension),
+		Filename: storedFileName,
 	}
 	err = json.NewEncoder(w).Encode(p)
 	if err != nil {
