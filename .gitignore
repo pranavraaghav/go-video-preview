@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# Application specific directories
+/uploads
+/output
+/zips
