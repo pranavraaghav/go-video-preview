@@ -70,16 +70,17 @@ func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(
 	}
 
 	framesPerSecond := v.getFramesPerSecond(intervalBetweenImages)
-
 	// Generate images from video using ffmpeg
-	err = exec.Command(
+	commandString := fmt.Sprintf(
+		"%s -i ./uploads/%s -r %0.2f -s %dx%d -f image2 %s/%%03d.jpeg",
 		v.ffmpegExecutablePath,
-		"-i", fmt.Sprintf("./uploads/%s", filename),
-		"-r", fmt.Sprintf("%0.2f", framesPerSecond),
-		"-s", fmt.Sprintf("%dx%d", width, height),
-		"-f", "image2",
-		fmt.Sprintf("%s/%%03d.jpeg", outputDirPath),
-	).Run()
+		filename,
+		framesPerSecond,
+		width,
+		height,
+		outputDirPath,
+	)
+	err = exec.Command("bash", "-c", commandString).Run()
 	if err != nil {
 		return nil, err
 	}
