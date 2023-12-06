@@ -24,3 +24,9 @@ go.work
 /uploads
 /output
 /zips
+
+# Temporary dir
+/tmp
+
+# Editor specific
+.idea
