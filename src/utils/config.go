@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	FfmpegPath string `env:"PATH_TO_FFMPEG_EXECUTABLE" envDefault:""`
-	Port       int    `env:"PORT" envDefault:"8080"`
+	Port       int    `env:"PORT" envDefault:"3000"`
 }
 
 func NewConfig() *Config {
