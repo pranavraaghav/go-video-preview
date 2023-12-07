@@ -80,7 +80,7 @@ func (v *videoUsecaseImplementation) GenerateImageZipFromVideo(
 		height,
 		outputDirPath,
 	)
-	err = exec.Command("bash", "-c", commandString).Run()
+	err = exec.Command("sh", "-c", commandString).Run()
 	if err != nil {
 		return nil, err
 	}
